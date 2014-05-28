@@ -114,7 +114,9 @@ angular.module('$strap.directives')
               return date;
             }
             if(!controller.$viewValue) element.val('');
-            return element.datepicker('update', controller.$viewValue);
+            return $timeout(function(){
+              element.datepicker('update', controller.$viewValue);
+            });
           };
 
         }
