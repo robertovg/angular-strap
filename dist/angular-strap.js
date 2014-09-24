@@ -1,6 +1,6 @@
 /**
  * AngularStrap - Twitter Bootstrap directives for AngularJS
- * @version v0.7.8 - 2014-05-28
+ * @version v0.7.8 - 2014-09-24
  * @link http://mgcrea.github.com/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -8,7 +8,7 @@
 
 /**
  * AngularStrap - Twitter Bootstrap directives for AngularJS
- * @version v0.7.8 - 2014-05-28
+ * @version v0.7.8 - 2014-09-24
  * @link http://mgcrea.github.com/angular-strap
  * @author Olivier Louvignes <olivier@mg-crea.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -401,9 +401,16 @@
                   return viewValue;
                 } else if (angular.isString(viewValue) && dateFormatRegexp.test(viewValue)) {
                   controller.$setValidity('date', true);
-                  if (isAppleTouch)
+                  if (isAppleTouch) {
                     return new Date(viewValue);
-                  return type === 'string' ? viewValue : $.fn.datepicker.DPGlobal.parseDate(viewValue, $.fn.datepicker.DPGlobal.parseFormat(format), language);
+                  } else {
+                    //If we have moment avaiable, we are using as it helps us to avoid problem with timezones
+                    if (typeof window.moment === 'function') {
+                      return window.moment(viewValue, format.toUpperCase()).toDate();
+                    } else {
+                      return type === 'string' ? viewValue : $.fn.datepicker.DPGlobal.parseDate(viewValue, $.fn.datepicker.DPGlobal.parseFormat(format), language);
+                    }
+                  }
                 } else {
                   controller.$setValidity('date', false);
                   return undefined;

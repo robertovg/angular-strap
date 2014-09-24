@@ -98,8 +98,16 @@ angular.module('$strap.directives')
               return viewValue;
             } else if(angular.isString(viewValue) && dateFormatRegexp.test(viewValue)) {
               controller.$setValidity('date', true);
-              if(isAppleTouch) return new Date(viewValue);
-              return type === 'string' ? viewValue : $.fn.datepicker.DPGlobal.parseDate(viewValue, $.fn.datepicker.DPGlobal.parseFormat(format), language);
+              if(isAppleTouch) {
+                return new Date(viewValue);
+              }else {
+                //If we have moment avaiable, we are using as it helps us to avoid problem with timezones
+                if(typeof( window.moment ) === 'function') {
+                  return window.moment(viewValue, format.toUpperCase()).toDate();
+                }else {
+                  return type === 'string' ? viewValue : $.fn.datepicker.DPGlobal.parseDate(viewValue, $.fn.datepicker.DPGlobal.parseFormat(format), language);
+                }
+              }
             } else {
               controller.$setValidity('date', false);
               return undefined;
