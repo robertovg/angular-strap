@@ -47,6 +47,7 @@ angular.module('$strap.directives')
   };
 
   var ISODateRegexp = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;
+  var DateStringRegexp = /\b(?:(?:Mon)|(?:Tues?)|(?:Wed(?:nes)?)|(?:Thur?s?)|(?:Fri)|(?:Sat(?:ur)?)|(?:Sun))(?:day)?\b[:\-,]?\s*(?:(?:jan|feb)?r?(?:uary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|oct(?:ober)?|(?:sept?|nov|dec)(?:ember)?)\s+\d{1,2}\s*,?\s*\d{4}/i;
 
   return {
     restrict: 'A',
@@ -55,11 +56,13 @@ angular.module('$strap.directives')
 
       var options = angular.extend({autoclose: true}, $strapConfig.datepicker || {});
       var type = attrs.dateType || options.type || 'date';
-
+      //Stop using type, and instead checking with regexp the nature of each modelValue
       var getFormattedModelValue = function(modelValue, format, language) {
-        if (modelValue && type === 'iso' && ISODateRegexp.test(modelValue)) {
+        if ( modelValue && angular.isString(modelValue) && DateStringRegexp.test(modelValue)) {
+          return new Date(modelValue);
+        } else if (modelValue && angular.isString(modelValue) && ISODateRegexp.test(modelValue)) {
           return $.fn.datepicker.DPGlobal.parseDate(new Date(modelValue), $.fn.datepicker.DPGlobal.parseFormat(format), language);
-        } else if(modelValue && type === 'date' && angular.isString(modelValue)) {
+        } else if(modelValue && angular.isString(modelValue)) {
           return $.fn.datepicker.DPGlobal.parseDate(modelValue, $.fn.datepicker.DPGlobal.parseFormat(format), language);
         } else {
           return modelValue;
